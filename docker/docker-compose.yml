@@ -1,0 +1,37 @@
+name: code-scanner
+
+services:
+
+  postgres:
+    container_name: postgres
+    image: postgres:14
+    env_file:
+      - .env
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+    networks:
+      - common-network
+
+  db-migrator:
+    container_name: db-migrator
+    build:
+      context: ../
+      dockerfile: app/db_migrator/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    networks:
+      - common-network
+    restart: on-failure:5
+
+
+volumes:
+  postgres_data:
+
+networks:
+  common-network:
+    external: false
+

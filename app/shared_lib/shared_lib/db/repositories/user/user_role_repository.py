@@ -1,9 +1,8 @@
 from typing import Optional
 
-from shared_lib.db import Role
-
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from shared_lib.db.models.user import Role
 from shared_lib.db.repositories.base.postgres_cached_base_repository import CachedBaseRepository
 
 

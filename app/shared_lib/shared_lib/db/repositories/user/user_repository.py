@@ -5,11 +5,11 @@ from sqlalchemy import select, func, case, literal, cast, or_
 from sqlalchemy import String, DateTime, Numeric, Integer
 from sqlalchemy.orm import joinedload, selectinload
 from sqlalchemy.sql import Select
-from sqlalchemy.sql.elements import UnaryExpression
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from shared_lib.db import User
+from shared_lib.db.models.user import User
 from shared_lib.db.repositories.base.postgres_base_repository import PostgresBaseRepository
+
 Order = str  # "asc" | "desc"
 
 
@@ -121,7 +121,6 @@ class UserRepository(PostgresBaseRepository[User]):
         result = await self._db_session.execute(stmt)
         return result.scalar_one()
 
-
     async def list_paginated(self, page: int = 1, limit: int = 15):
         if page < 1:
             page = 1
@@ -228,12 +227,12 @@ class UserRepository(PostgresBaseRepository[User]):
         return base.desc().nulls_last()
 
     async def list_paginated_sorted_searched(
-        self,
-        page: int = 1,
-        limit: int = 15,
-        sort: Optional[str] = None,
-        order: str = "desc",
-        search: Optional[str] = None,
+            self,
+            page: int = 1,
+            limit: int = 15,
+            sort: Optional[str] = None,
+            order: str = "desc",
+            search: Optional[str] = None,
     ) -> Dict[str, Any]:
 
         page = max(page, 1)

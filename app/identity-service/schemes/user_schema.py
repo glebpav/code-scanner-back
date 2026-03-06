@@ -11,7 +11,7 @@ class CreateUserRequest(BaseModel):
     last_name: Optional[Annotated[str, Field(max_length=64)]] = None
     email: Annotated[str, Field(max_length=254)]
     position: Optional[Annotated[str, Field(max_length=128)]] = None
-    company: Annotated[str, Field(max_length=128)]
+    company: Optional[Annotated[str, Field(max_length=128)]]
     password: Annotated[str, Field(max_length=64)]
 
     @model_validator(mode='after')

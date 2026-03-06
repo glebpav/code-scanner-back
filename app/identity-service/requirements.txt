@@ -1,0 +1,11 @@
+fastapi>=0.100.0,<0.101.0
+uvicorn>=0.21.1,<0.24.0
+pydantic>=2.0.0,<2.1.0
+sqlalchemy>=2.0.0,<2.1.0
+asyncpg>=0.29.0,<0.30.0
+PyJWT>=2.8.0,<3.0.0
+python-dotenv>=1.0.0,<1.1.0
+passlib==1.7.4
+pymongo
+prometheus-fastapi-instrumentator
+python-multipart

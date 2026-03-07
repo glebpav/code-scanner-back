@@ -6,8 +6,11 @@ from sqlalchemy import pool
 
 from alembic import context
 
+
 from shared_lib.db.models.base import PostgresAbstractEntity
 from shared_lib.db.models.user import User, UserRole, Role
+from shared_lib.db.models.user_token import UserToken
+from shared_lib.db.models.update_version import UpdateVersion, UpdateVersionFile
 
 
 config = context.config

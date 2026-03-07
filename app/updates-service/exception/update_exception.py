@@ -14,3 +14,13 @@ class UpdateFileNotFoundException(HTTPException):
 class UpdateArchiveBuildException(HTTPException):
     def __init__(self, detail: str = "Failed to build update archive"):
         super().__init__(status_code=502, detail=detail)
+
+
+class InvalidUserTokenException(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=401, detail="Invalid user token")
+
+
+class InactiveUserTokenException(HTTPException):
+    def __init__(self):
+        super().__init__(status_code=401, detail="User token is inactive")

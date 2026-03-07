@@ -12,6 +12,8 @@ class Config:
     ALLOW_ALL_ORIGINS: bool = _get_bool_env("ALLOW_ALL_ORIGINS", False)
     DATABASE_URL: str = os.environ["DB_ASYNC_URL"]
 
+    USER_TOKEN_SECRET: str = os.environ["USER_TOKEN_SECRET"]
+
     OBJECT_STORAGE_ACCESS_KEY: str = os.environ["OBJECT_STORAGE_ACCESS_KEY"]
     OBJECT_STORAGE_SECRET_KEY: str = os.environ["OBJECT_STORAGE_SECRET_KEY"]
     OBJECT_STORAGE_ENDPOINT_URL: str = os.environ["OBJECT_STORAGE_ENDPOINT_URL"]

@@ -1,11 +1,12 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, Query
 from fastapi.params import Depends
 from fastapi.responses import Response
 from starlette import status
 
-from dependencies import get_update_service
+from dependencies import get_update_service, get_user_token_auth_service
 from scheme.update_scheme import CreateUpdateVersionRequest, UpdateVersionResponse
 from service.update_service import UpdateService
+from service.user_token_auth_service import UserTokenAuthService
 
 router = APIRouter(prefix="/updates", tags=["Updates"])
 
@@ -51,8 +52,11 @@ async def get_update_versions(
     status_code=status.HTTP_200_OK,
 )
 async def download_latest_update_archive(
+        user_token: str = Query(...),
         update_service: UpdateService = Depends(get_update_service),
+        user_token_auth_service: UserTokenAuthService = Depends(get_user_token_auth_service),
 ) -> Response:
+    await user_token_auth_service.validate_active_user_token(user_token)
     archive_bytes, filename = await update_service.download_latest_update_archive()
     return Response(
         content=archive_bytes,

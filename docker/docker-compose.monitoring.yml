@@ -1,0 +1,58 @@
+services:
+
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus
+    volumes:
+      - ../app/monitoring/prometheus-config.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    networks:
+      - common-network
+
+  grafana:
+    image: grafana/grafana:10.4.3
+    container_name: grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - ../app/monitoring/grafana/datasources:/etc/grafana/provisioning/datasources
+      - ../app/monitoring/grafana/alerting:/etc/grafana/provisioning/alerting
+      - grafana_data:/var/lib/grafana
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD}
+    networks:
+      - common-network
+
+  loki:
+    image: grafana/loki:2.9.5
+    container_name: loki
+    user: "0"
+    volumes:
+      - ../app/monitoring/loki-config.yaml:/etc/loki/config.yaml
+      - loki_data:/loki
+    command: -config.file=/etc/loki/config.yaml
+    ports:
+      - "3100:3100"
+    networks:
+      - common-network
+
+  promtail:
+    image: grafana/promtail:3.0.0
+    container_name: promtail
+    volumes:
+      - ../app/monitoring/promtail-config.yml:/etc/promtail/config.yaml
+      - /var/log:/var/log
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yaml
+    networks:
+      - common-network
+
+volumes:
+  loki_data:
+  grafana_data:
+
+networks:
+  common-network:
+    external: false
+

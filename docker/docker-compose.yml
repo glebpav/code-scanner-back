@@ -54,6 +54,19 @@ services:
     networks:
       - common-network
 
+  updates-service:
+    container_name: updates-service
+    build:
+      context: ../
+      dockerfile: app/updates-service/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: no
+    networks:
+      - common-network
+
 
   nginx-proxy:
     build:
@@ -68,6 +81,8 @@ services:
     restart: unless-stopped
     depends_on:
       - identity-service
+      - user-service
+      - updates-service
 
 
 

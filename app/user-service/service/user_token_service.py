@@ -25,7 +25,7 @@ class UserTokenService:
         user_token_entity = UserToken(
             first_name=create_user_token_request.first_name,
             last_name=create_user_token_request.last_name,
-            created_at=datetime.now(),
+            created_at=datetime.datetime.utcnow(),
             is_active=True,
         )
 

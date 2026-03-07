@@ -75,7 +75,8 @@ services:
     env_file:
       - .env
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
     networks:
       - common-network
     restart: unless-stopped
@@ -83,6 +84,10 @@ services:
       - identity-service
       - user-service
       - updates-service
+    volumes:
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+      - /etc/letsencrypt:/etc/letsencrypt:ro
 
 
 

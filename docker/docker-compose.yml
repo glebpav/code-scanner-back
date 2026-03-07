@@ -41,6 +41,19 @@ services:
     networks:
       - common-network
 
+  user-service:
+    container_name: user-service
+    build:
+      context: ../
+      dockerfile: app/user-service/Dockerfile
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    restart: no
+    networks:
+      - common-network
+
 
   nginx-proxy:
     build:

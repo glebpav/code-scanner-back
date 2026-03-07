@@ -10,6 +10,7 @@ from shared_lib.db.repositories.user.user_repository import UserRepository
 from config import Config
 from database import get_db_session
 from service.decoder_service import DecoderService
+from service.user_service import UserService
 from service.user_token_service import UserTokenService
 
 
@@ -38,4 +39,14 @@ async def get_decoder_service(
 ):
     return DecoderService(
         config=config
+    )
+
+
+async def get_user_service(
+        config: Annotated[Config, Depends(get_config)],
+        session: Annotated[AsyncSession, Depends(get_db_session)],
+):
+    return UserService(
+        config=config,
+        user_repository=UserRepository(session)
     )

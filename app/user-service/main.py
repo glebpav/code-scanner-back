@@ -4,12 +4,14 @@ from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
-from api.v1.user_routes import router
+from api.v1.user_routes import user_router
+from api.v1.user_token_routes import router
 from config import Config
 
 app = FastAPI()
 Instrumentator().instrument(app).expose(app)
 app.include_router(router)
+app.include_router(user_router)
 
 if Config.ALLOW_ALL_ORIGINS:
     app.add_middleware(

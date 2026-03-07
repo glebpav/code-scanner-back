@@ -30,7 +30,6 @@ class UpdateService:
             self,
             create_update_version_request: CreateUpdateVersionRequest,
     ) -> UpdateVersion:
-
         update_version_entity = UpdateVersion(
             description=create_update_version_request.description,
             files=[
@@ -70,23 +69,28 @@ class UpdateService:
 
     async def _build_archive(self, update_version: UpdateVersion) -> bytes:
         archive_buffer = BytesIO()
+        used_archive_names: set[str] = set()
 
         with ZipFile(archive_buffer, mode="w", compression=ZIP_DEFLATED) as zip_file:
             info_content = self._build_info_file_content(update_version)
             zip_file.writestr("update-description.txt", info_content)
 
             for file_entity in update_version.files:
-                print("Downloading from S3:", file_entity.s3_key)
                 download_result = await self.__s3_client.download_file(file_entity.s3_key)
-                print(f"Download result: {download_result}")
+
                 if not download_result.get("success"):
                     error_msg = download_result.get("error_msg", "Unknown S3 error")
                     if "not found" in error_msg.lower():
                         raise UpdateFileNotFoundException(file_entity.s3_key)
                     raise UpdateArchiveBuildException(error_msg)
 
-                zip_path = f"files/{self._safe_zip_path(file_entity.s3_key)}"
-                zip_file.writestr(zip_path, download_result["result"])
+                archive_name = self._build_flat_archive_name(
+                    s3_key=file_entity.s3_key,
+                    used_archive_names=used_archive_names,
+                    position=file_entity.position,
+                )
+
+                zip_file.writestr(archive_name, download_result["result"])
 
         archive_buffer.seek(0)
         return archive_buffer.getvalue()
@@ -106,13 +110,27 @@ class UpdateService:
         return "\n".join(lines)
 
     @staticmethod
-    def _safe_zip_path(s3_key: str) -> str:
+    def _build_flat_archive_name(
+            s3_key: str,
+            used_archive_names: set[str],
+            position: int,
+    ) -> str:
         normalized = PurePosixPath(s3_key.lstrip("/"))
         if ".." in normalized.parts:
             raise UpdateArchiveBuildException("Unsafe S3 key detected while building archive")
 
-        result = normalized.as_posix()
-        if not result or result == ".":
-            raise UpdateArchiveBuildException("Empty S3 key detected while building archive")
+        file_name = normalized.name
+        if not file_name:
+            raise UpdateArchiveBuildException("S3 key must point to a file")
 
-        return result
+        candidate = file_name
+        if candidate in used_archive_names:
+            candidate = f"{position + 1}_{candidate}"
+
+        duplicate_counter = 1
+        while candidate in used_archive_names:
+            duplicate_counter += 1
+            candidate = f"{position + 1}_{duplicate_counter}_{file_name}"
+
+        used_archive_names.add(candidate)
+        return candidate
